@@ -17,7 +17,7 @@ pending_posts = {}
 
 @dp.message(CommandStart())
 async def on_start(message: Message):
-    await message.answer("Бот запущен. Отправь текст для публикации.")
+    await message.answer("The bot is running. Send text for publication.")
 
 
 @dp.message(F.text)
@@ -53,20 +53,20 @@ async def handle_moderation(callback: CallbackQuery):
     post = pending_posts.get(post_id)
 
     if not post:
-        await callback.answer("Пост не найден или уже обработан.", show_alert=True)
+        await callback.answer("Post not found or already processed.", show_alert=True)
         return
 
     if action == 'reject':
-        await callback.message.edit_text("Пост отклонён.")
+        await callback.message.edit_text("Post rejected.")
         pending_posts.pop(post_id, None)
     else:
-        await callback.message.edit_text("Пост одобрен. Запрашиваем время публикации...")
+        await callback.message.edit_text("Post approved. Requesting publication time...")
         markup = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="📤 Опубликовать сейчас", callback_data=f"publish_now:{post_id}")],
-            [InlineKeyboardButton(text="🗓 Указать дату", callback_data=f"ask_date:{post_id}")]
+            [InlineKeyboardButton(text="📤 Publish now", callback_data=f"publish_now:{post_id}")],
+            [InlineKeyboardButton(text="🗓 Specify date", callback_data=f"ask_date:{post_id}")]
         ])
         await bot.send_message(callback.from_user.id,
-                               f"Пост:\n\n{post['content']}\n\nКак опубликовать?",
+                               f"Post:\n\n{post['content']}\n\nHow to publish?",
                                reply_markup=markup)
 
 
@@ -77,7 +77,7 @@ async def publish_now(callback: CallbackQuery):
 
     if post:
         await bot.send_message(settings.CHANNEL_ID, f"#fromSubs\n\n{post['content']}")
-        await callback.message.edit_text("Пост опубликован.")
+        await callback.message.edit_text("The post has been published.")
         pending_posts.pop(post_id, None)
 
 
@@ -87,12 +87,12 @@ async def ask_date(callback: CallbackQuery):
     post = pending_posts.get(post_id)
 
     if not post:
-        await callback.answer("Пост не найден.", show_alert=True)
+        await callback.answer("Post not found.", show_alert=True)
         return
 
     post['awaiting_date_from'] = callback.from_user.id
     await callback.message.edit_text(
-        "Введите дату публикации в любом формате.\n\nНапример:\n`09.06 15:30` или `09.06.2025 1530`",
+        "Enter the publication date in any format.\n\nFor example:\n`09.06 15:30` or `09.06.2025 1530`",
         parse_mode=ParseMode.MARKDOWN
     )
 
@@ -104,13 +104,13 @@ async def handle_schedule_date(message: Message, post_id: int, post: dict):
         delay = (dt - now).total_seconds()
 
         if delay < 0:
-            await message.reply("Дата уже прошла. Пожалуйста, введите новую.")
+            await message.reply("The date has already passed. Please enter a new one.")
             return
 
-        await message.reply(f"Пост запланирован на {dt.strftime('%d-%m-%Y %H:%M:%S')}")
+        await message.reply(f"The post is scheduled for {dt.strftime('%d-%m-%Y %H:%M:%S')}")
         asyncio.create_task(schedule_publish(post_id, post['content'], delay))
     except Exception as e:
-        await message.reply(f"Ошибка разбора даты: {e}")
+        await message.reply(f"Date parsing error: {e}")
 
 
 async def schedule_publish(post_id: int, content: str, delay: float):
