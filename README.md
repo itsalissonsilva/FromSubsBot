@@ -33,11 +33,11 @@
 4. Run the bot:
     ```bash
     python main.py
-
+---
 🛠 Configuration
 All configuration is stored centrally in the config.py file, which uses pydantic and dotenv.
-```python
-from config import settings
+    ```python
+    from config import settings
 
 print(settings.API_TOKEN)
 
