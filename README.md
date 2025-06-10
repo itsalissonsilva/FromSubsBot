@@ -33,14 +33,18 @@
 4. Run the bot:
     ```bash
     python main.py
+
 ---
+
 🛠 Configuration
 All configuration is stored centrally in the config.py file, which uses pydantic and dotenv.
     ```python
     
     from config import settings
     print(settings.API_TOKEN)
+
 ---
+
 🔐 Security
 All keys and tokens are moved to .env.
 
